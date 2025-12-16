@@ -8,3 +8,5 @@ azure-identity
 aiohttp
 jinja2
 python-multipart
+python-dotenv
+slowapi
