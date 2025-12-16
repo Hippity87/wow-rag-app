@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+openai
+azure-search-documents
+azure-core
+azure-identity
+aiohttp
+jinja2
+python-multipart

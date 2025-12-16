@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoW Classic Oracle</title>
+    <style>
+        body {
+            background-color: #0f1216; /* Dark WoW bg */
+            color: #f8b700; /* WoW Gold */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            width: 800px;
+            height: 80vh;
+            background-color: #1a1f29;
+            border: 2px solid #564b36;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        .header {
+            padding: 20px;
+            border-bottom: 2px solid #564b36;
+            text-align: center;
+            background-image: linear-gradient(#252b3a, #1a1f29);
+        }
+        .header h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 5px;
+            line-height: 1.5;
+        }
+        .user-message {
+            align-self: flex-end;
+            background-color: #4a3b25;
+            color: #fff;
+            border: 1px solid #7a6340;
+        }
+        .bot-message {
+            align-self: flex-start;
+            background-color: #2b3340;
+            color: #dcd2bb; /* Parchment white */
+            border: 1px solid #455268;
+        }
+        .input-area {
+            padding: 20px;
+            border-top: 2px solid #564b36;
+            display: flex;
+            gap: 10px;
+            background-color: #151b26;
+        }
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #564b36;
+            background-color: #0f1216;
+            color: white;
+            font-size: 1rem;
+        }
+        button {
+            padding: 10px 25px;
+            background-color: #7a1f1f; /* Horde Red / Button color */
+            color: white;
+            border: 1px solid #a83232;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        button:hover { background-color: #a83232; }
+        .loading { font-style: italic; color: #888; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="header">
+        <h1>Azeroth Archives</h1>
+        <small>Powered by Azure OpenAI</small>
+    </div>
+    <div class="chat-box" id="chat-box">
+        <div class="message bot-message">
+            Greetings, traveler. I hold the knowledge of Quests, Items, and the voices of the Community. What do you seek?
+        </div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Ask about quests, items, or community opinions..." onkeypress="handleEnter(event)">
+        <button onclick="sendMessage()">Ask</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const inputField = document.getElementById('user-input');
+        const message = inputField.value.trim();
+        if (!message) return;
+
+        // Add user message to UI
+        addMessage(message, 'user-message');
+        inputField.value = '';
+
+        // Show loading indicator (optional simplistic way)
+        const loadingId = addMessage("Consulting the archives...", 'bot-message loading');
+
+        try {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+            
+            // Remove loading message
+            document.getElementById(loadingId).remove();
+
+            if (data.error) {
+                addMessage("Error: " + data.error, 'bot-message');
+            } else {
+                addMessage(data.response, 'bot-message');
+            }
+        } catch (error) {
+            document.getElementById(loadingId).remove();
+            addMessage("Connection to Azeroth lost.", 'bot-message');
+        }
+    }
+
+    function addMessage(text, className) {
+        const chatBox = document.getElementById('chat-box');
+        const div = document.createElement('div');
+        div.className = 'message ' + className;
+        // Simple fix to allow newlines in bot response
+        div.innerText = text; 
+        div.id = 'msg-' + Date.now();
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return div.id;
+    }
+
+    function handleEnter(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+</script>
+
+</body>
+</html>
