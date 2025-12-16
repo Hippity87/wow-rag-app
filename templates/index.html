@@ -17,7 +17,7 @@
         }
         .chat-container {
             width: 800px;
-            height: 80vh;
+            height: 85vh;
             background-color: #1a1f29;
             border: 2px solid #564b36;
             border-radius: 8px;
@@ -40,23 +40,48 @@
             flex-direction: column;
             gap: 15px;
         }
+        /* Scrollbar styling */
+        .chat-box::-webkit-scrollbar { width: 10px; }
+        .chat-box::-webkit-scrollbar-track { background: #0f1216; }
+        .chat-box::-webkit-scrollbar-thumb { background: #564b36; border-radius: 5px; }
+
         .message {
             max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 5px;
-            line-height: 1.5;
+            padding: 12px 18px;
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 1rem;
+            position: relative;
         }
         .user-message {
             align-self: flex-end;
-            background-color: #4a3b25;
-            color: #fff;
+            background-color: #5c4b32; /* Lighter brown for user */
+            color: #ffffff;
             border: 1px solid #7a6340;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        .user-message::before {
+            content: "YOU";
+            display: block;
+            font-size: 0.7rem;
+            color: #dcd2bb;
+            margin-bottom: 4px;
+            font-weight: bold;
         }
         .bot-message {
             align-self: flex-start;
-            background-color: #2b3340;
-            color: #dcd2bb; /* Parchment white */
+            background-color: #232a35;
+            color: #dcd2bb;
             border: 1px solid #455268;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        .bot-message::before {
+            content: "ORACLE";
+            display: block;
+            font-size: 0.7rem;
+            color: #f8b700;
+            margin-bottom: 4px;
+            font-weight: bold;
         }
         .input-area {
             padding: 20px;
@@ -67,25 +92,29 @@
         }
         input {
             flex: 1;
-            padding: 12px;
+            padding: 15px;
             border-radius: 4px;
             border: 1px solid #564b36;
-            background-color: #0f1216;
+            background-color: #0c0f12;
             color: white;
             font-size: 1rem;
+            outline: none;
         }
+        input:focus { border-color: #f8b700; }
         button {
-            padding: 10px 25px;
-            background-color: #7a1f1f; /* Horde Red / Button color */
+            padding: 0 30px;
+            background-color: #7a1f1f; /* Horde Red */
             color: white;
             border: 1px solid #a83232;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1rem;
             text-transform: uppercase;
+            transition: background 0.2s;
         }
         button:hover { background-color: #a83232; }
-        .loading { font-style: italic; color: #888; font-size: 0.9rem; }
+        .loading { font-style: italic; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -93,15 +122,15 @@
 <div class="chat-container">
     <div class="header">
         <h1>Azeroth Archives</h1>
-        <small>Powered by Azure OpenAI</small>
+        <small>Powered by Azure OpenAI & Azure AI Search</small>
     </div>
     <div class="chat-box" id="chat-box">
         <div class="message bot-message">
-            Greetings, traveler. I hold the knowledge of Quests, Items, and the voices of the Community. What do you seek?
+            Greetings, hero. The archives are open. Ask about quests, items, or community strategies.
         </div>
     </div>
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Ask about quests, items, or community opinions..." onkeypress="handleEnter(event)">
+        <input type="text" id="user-input" placeholder="Type your question here (e.g. How to defeat Hogger?)" onkeypress="handleEnter(event)">
         <button onclick="sendMessage()">Ask</button>
     </div>
 </div>
@@ -109,14 +138,20 @@
 <script>
     async function sendMessage() {
         const inputField = document.getElementById('user-input');
+        const sendButton = document.querySelector('button'); // Haetaan nappi
         const message = inputField.value.trim();
+        
         if (!message) return;
 
-        // Add user message to UI
+        // 1. UI-LUKITUS: Disabloidaan nappi ja kenttä heti
+        inputField.disabled = true;
+        sendButton.disabled = true;
+        sendButton.innerText = "Thinking..."; // Visuaalinen palaute
+        sendButton.style.backgroundColor = "#555"; // Harmaa väri
+
         addMessage(message, 'user-message');
         inputField.value = '';
-
-        // Show loading indicator (optional simplistic way)
+        
         const loadingId = addMessage("Consulting the archives...", 'bot-message loading');
 
         try {
@@ -125,9 +160,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: message })
             });
-            const data = await response.json();
             
-            // Remove loading message
+            // Käsitellään Rate Limit -virhe (429 Too Many Requests)
+            if (response.status === 429) {
+                document.getElementById(loadingId).remove();
+                addMessage("Chill, adventurer! You are casting spells too fast. (Rate limit exceeded)", 'bot-message');
+                return;
+            }
+
+            const data = await response.json();
             document.getElementById(loadingId).remove();
 
             if (data.error) {
@@ -136,8 +177,16 @@
                 addMessage(data.response, 'bot-message');
             }
         } catch (error) {
-            document.getElementById(loadingId).remove();
-            addMessage("Connection to Azeroth lost.", 'bot-message');
+            const loadingElement = document.getElementById(loadingId);
+            if (loadingElement) loadingElement.remove();
+            addMessage("Connection error. The goblins cut the line.", 'bot-message');
+        } finally {
+            // 2. VAPAUTUS: Palautetaan kontrollit AINA, onnistui tai epäonnistui
+            inputField.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerText = "ASK";
+            sendButton.style.backgroundColor = "#7a1f1f"; // Palauta punainen väri
+            inputField.focus();
         }
     }
 
@@ -145,16 +194,26 @@
         const chatBox = document.getElementById('chat-box');
         const div = document.createElement('div');
         div.className = 'message ' + className;
-        // Simple fix to allow newlines in bot response
+        
+        // Käytetään innerText turvallisuuden vuoksi, mutta korjataan rivinvaihdot
         div.innerText = text; 
-        div.id = 'msg-' + Date.now();
+        div.id = 'msg-' + Date.now() + Math.random();
+        
         chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        scrollToBottom();
         return div.id;
     }
 
+    function scrollToBottom() {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
     function handleEnter(e) {
-        if (e.key === 'Enter') sendMessage();
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Estä lomakkeen lähetys tai muut oletustoiminnot
+            sendMessage();
+        }
     }
 </script>
 
