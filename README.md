@@ -38,7 +38,7 @@ This project is built using open datasets sourced from Kaggle. Huge thanks to th
     [https://www.kaggle.com/datasets/ammaruddinqureshi/world-of-warcraft-classic-quest-items-dataset](https://www.kaggle.com/datasets/ammaruddinqureshi/world-of-warcraft-classic-quest-items-dataset)
     *Used for: Item drop locations and drop rates.*
 
-3.  **WoW Classic Gamer Jargon and Terms** by Jesterhead  
+3.  **World of Warcraft YouTube Comments (2018-2025)** by Jesterhead  
     [https://www.kaggle.com/datasets/jesterhead/wow-classic-gamer-jargon-and-terms-dataset](https://www.kaggle.com/datasets/jesterhead/wow-classic-gamer-jargon-and-terms-dataset)
     *Used for: Simulating community discussions and extracting player sentiment/strategies.*
 
