@@ -4,7 +4,7 @@
 
 The bot is hosted on Azure and uses OpenAI's GPT-4o model to synthesize answers from indexed CSV data.
 
-🔗 **Live Demo:** [https://wow.projectlexagon.fi](https://wow.projectlexagon.fi) *note: Live Demo may only be available on request*
+🔗 **Live Demo:** [https://wow.projectlexagon.fi](https://wow.projectlexagon.fi) *note: Live Demo may only be available on request-- you can access a finnish demonstration of the service by clicking the image below*
     [![Finnish Demo-Video](https://img.youtube.com/vi/5A0xIQGBn3c/maxresdefault.jpg)](https://www.youtube.com/watch?v=5A0xIQGBn3c)
 
 ## 🏗 Architecture & Tech Stack
