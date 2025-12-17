@@ -1,10 +1,11 @@
 # ⚔️ Azeroth Archives - WoW Classic RAG Oracle
 
-**Azeroth Archives** is an AI-powered chatbot designed to assist World of Warcraft Classic players. It utilizes **Retrieval-Augmented Generation (RAG)** to provide accurate answers about quests, items, and community opinions based on custom indexed datasets.
+**Azeroth Archives Oracle** is an AI-powered chatbot designed to assist World of Warcraft Classic players. It utilizes **Retrieval-Augmented Generation (RAG)** to provide accurate answers about quests, items, and community opinions based on custom indexed datasets.
 
 The bot is hosted on Azure and uses OpenAI's GPT-4o model to synthesize answers from indexed CSV data.
 
-🔗 **Live Demo:** [https://wow.projectlexagon.fi](https://wow.projectlexagon.fi)
+🔗 **Live Demo:** [https://wow.projectlexagon.fi](https://wow.projectlexagon.fi) *note: Live Demo may only be available on request*
+    [![Finnish Demo-Video](https://img.youtube.com/vi/5A0xIQGBn3c/maxresdefault.jpg)](https://www.youtube.com/watch?v=5A0xIQGBn3c)
 
 ## 🏗 Architecture & Tech Stack
 
